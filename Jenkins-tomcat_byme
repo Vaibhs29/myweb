@@ -31,7 +31,7 @@ pipeline{
                   ], 
                   credentialsId: 'nexu3', 
                   groupId: 'in.javahome', 
-                  nexusUrl: '13.233.69.97:8081', 
+                  nexusUrl: '172.31.1.34:8081', 
                   nexusVersion: 'nexus3', 
                   protocol: 'http', 
                   repository: 'sample-release', 
@@ -40,7 +40,7 @@ pipeline{
             }
         stage("deploy-dev"){
             steps{
-                sshagent(['Tomcat_new']) {
+                sshagent(['tomcat_new']) {
                 sh """
                     scp -o StrictHostKeyChecking=no target/myweb-8.2.0.war  ec2-user@172.31.1.113:/home/ec2-user/apache-tomcat-9.0.80/webapps/
                     
