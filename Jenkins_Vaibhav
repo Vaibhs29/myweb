@@ -1,0 +1,55 @@
+pipeline{
+    agent any
+     tools {
+        maven 'Maven-3.6.1'
+    }
+    
+    environment{
+        PATH = "/opt/maven3/bin:$PATH"
+    }
+
+  stages {
+		
+        stage('Git checkout') {
+            steps {
+               git 'https://github.com/Vaibhs29/myweb.git'
+            }
+        }
+		stage ('sonar scan'){
+		     steps {
+				 sh"""
+				     mvn clean sonar:sonar 
+				""" 
+			 }
+		} 
+		stage ('create a build'){
+		     steps {
+				 sh"""
+				     mvn clean package 
+				""" 
+			 }
+		}
+		stage ('nexus artifact upload'){
+			 steps {
+				 nexusArtifactUploader artifacts: [[artifactId: 'myweb', classifier: '', file: 'target/myweb.8.2.2.war', type: 'war']], credentialsId: 'Nexus_3', groupId: 'in.javahome', nexusUrl: '172.31.1.34:8081', nexusVersion: 'nexus3', protocol: 'http', repository: 'sample-release', version: '8.2.2'
+			 }
+		}
+		stage ('Deploy in Tomcat'){
+            steps {
+				sshagent(['Tomcat_newkey']) {
+				 	
+                  sh """
+                    scp -o StrictHostKeyChecking=no target/myweb-8.2.2.war  ec2-user@172.31.1.113:/home/ec2-user/apache-tomcat-9.0.80/webapps/
+                    
+                    ssh ec2-user@172.31.1.113 /home/ec2-user/apache-tomcat-9.0.80/bin/shutdown.sh
+                    
+                    ssh ec2-user@172.31.1.113 /home/ec2-user/apache-tomcat-9.0.80/bin/startup.sh
+                
+                """
+				}
+			}				
+      }
+			
+	}	 
+		
+  }
