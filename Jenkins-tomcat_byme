@@ -25,24 +25,24 @@ pipeline{
                        [
                             artifactId: 'myweb', 
                             classifier: '', 
-                            file: "target/myweb-8.2.2.war", 
+                            file: "target/myweb-8.2.0.war", 
                             type: 'war'
                        ]
                   ], 
-                  credentialsId: 'nexu_3', 
+                  credentialsId: 'nexus3', 
                   groupId: 'in.javahome', 
                   nexusUrl: '172.31.1.34:8081', 
                   nexusVersion: 'nexus3', 
                   protocol: 'http', 
                   repository: 'sample-release', 
-                  version: '8.2.2'  
+                  version: '8.2.0'  
               }
             }
         stage("deploy-dev"){
             steps{
-                sshagent(['Tomcat_newkey']) {
+                sshagent(['Nexus']) {
                 sh """
-                    scp -o StrictHostKeyChecking=no target/myweb-8.2.2.war  ec2-user@172.31.1.113:/home/ec2-user/apache-tomcat-9.0.80/webapps/
+                    scp -o StrictHostKeyChecking=no target/myweb-8.2.0.war  ec2-user@172.31.1.113:/home/ec2-user/apache-tomcat-9.0.80/webapps/
                     
                     ssh ec2-user@172.31.1.113 /home/ec2-user/apache-tomcat-9.0.80/bin/shutdown.sh
                     
