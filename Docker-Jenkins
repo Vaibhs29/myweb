@@ -65,8 +65,8 @@ pipeline {
                 sshagent(['Docker']) {
 
 				 sh '''
-                    ssh ec2-user@3.110.155.30 -o StrictHostKeyChecking=no "docker pull vaibhavy/docker-test:tomcat"
-                    ssh ec2-user@3.110.155.30 -o StrictHostKeyChecking=no "docker run -d -p 2000:8080 vaibhavy/docker-test:tomcat"
+                    ssh ec2-user@3.110.155.30 -o StrictHostKeyChecking=no "sudo docker pull vaibhavy/docker-test:tomcat"
+                    ssh ec2-user@3.110.155.30 -o StrictHostKeyChecking=no "sudo docker run -d -p 2000:8080 vaibhavy/docker-test:tomcat"
                     '''
   
 				}
