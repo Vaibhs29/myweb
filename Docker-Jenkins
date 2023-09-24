@@ -1,0 +1,83 @@
+pipeline {
+    agent any
+
+    tools {
+        maven 'Maven-3.6.1'
+    }
+
+    environment {
+        PATH = "/opt/maven3/bin:$PATH"
+    }
+
+    stages {
+        stage("Git Checkout") {
+            steps {
+                git 'https://github.com/Vaibhs29/myweb.git'
+
+            }
+        }
+		
+		stage("Maven build") {
+		   steps {
+		          sh "mvn clean sonar:sonar package"
+				   }
+				}
+		stage ("Nexus Artifact Uploading"){
+		    steps {
+		   
+			  nexusArtifactUploader artifacts: 
+		  [
+				[
+					artifactId: 'myweb', 
+					classifier: '',
+					file: 'target/myweb.8.2.1.war',
+					type: 'war'
+				]
+  
+		  ],
+  
+				  credentialsId: 'nexus3', 
+				  groupId: 'in.javahome', 
+				  nexusUrl: '172.31.32.203:8081', 
+				  nexusVersion: 'nexus3', 
+				  protocol: 'http', 
+				  repository: 'sample_release', 
+				  version: '8.2.1'
+			  
+			  
+		    }
+			
+		}
+		 stage("DockerFile Build") {
+            steps {
+                sh """
+					docker build -t nginx .
+					docker tag nginx vaibhavy/docker-test:nginx
+					docker login -u vaibhavy -p Vaibhav@123
+					docker push vaibhavy/docker-test:nginx
+                """
+            }
+        }
+
+		stage("deploy-dev") {
+            
+			steps {
+                sshagent(['Docker']) {
+
+				 sh '''
+                    ssh ec2-user@172.31.11.28 -o StrictHostKeyChecking=no "docker pull vaibhavy/docker-test:nginx"
+                    ssh ec2-user@172.31.11.28 -o StrictHostKeyChecking=no "docker run -d -p 2000:8080 vaibhavy/docker-test:nginx"
+                    '''
+  
+				}
+		
+		
+		   
+
+			}
+
+        }
+		
+	}
+	
+}
