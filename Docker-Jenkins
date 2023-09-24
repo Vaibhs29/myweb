@@ -51,10 +51,10 @@ pipeline {
 		 stage("DockerFile Build") {
             steps {
                 sh """
-					docker build -t tomcat .
-					docker tag tomcat vaibhavy/docker-test:tomcat
-					docker login -u vaibhavy -p Vaibhav@123
-					docker push vaibhavy/docker-test:tomcat
+					sudo docker build -t tomcat .
+					sudo docker tag tomcat vaibhavy/docker-test:tomcat
+					sudo docker login -u vaibhavy -p Vaibhav@123
+					sudo docker push vaibhavy/docker-test:tomcat
                 """
             }
         }
