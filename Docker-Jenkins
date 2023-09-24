@@ -51,10 +51,10 @@ pipeline {
 		 stage("DockerFile Build") {
             steps {
                 sh """
-					docker build -t nginx .
-					docker tag nginx vaibhavy/docker-test:nginx
+					docker build -t tomcat .
+					docker tag tomcat vaibhavy/docker-test:tomcat
 					docker login -u vaibhavy -p Vaibhav@123
-					docker push vaibhavy/docker-test:nginx
+					docker push vaibhavy/docker-test:tomcat
                 """
             }
         }
@@ -65,8 +65,8 @@ pipeline {
                 sshagent(['Docker']) {
 
 				 sh '''
-                    ssh ec2-user@172.31.11.28 -o StrictHostKeyChecking=no "docker pull vaibhavy/docker-test:nginx"
-                    ssh ec2-user@172.31.11.28 -o StrictHostKeyChecking=no "docker run -d -p 2000:8080 vaibhavy/docker-test:nginx"
+                    ssh ec2-user@172.31.11.28 -o StrictHostKeyChecking=no "docker pull vaibhavy/docker-test:tomcat"
+                    ssh ec2-user@172.31.11.28 -o StrictHostKeyChecking=no "docker run -d -p 2000:8080 vaibhavy/docker-test:tomcat"
                     '''
   
 				}
